@@ -1,83 +1,72 @@
-<?php 
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "universitas";
 
-    $server = "localhost";
-    $username = "root";
-    $password = "";
-    $dbName = "universitas";
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    $conn = mysqli_connect($server , $username , $password , $dbName);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    if(!$conn) {
-        die('Database gagal terhubung');
+function query($query) {
+    global $conn;
+    $result = $conn->query($query);
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
     }
+    return $rows;
+}
 
-    function query($query) {
-        global $conn;
+function countMahasiswa($search = '') {
+    global $conn;
+    $query = "SELECT COUNT(*) as count FROM mahasiswa WHERE nama LIKE '%$search%' OR npm LIKE '%$search%'";
+    $result = $conn->query($query);
+    $row = $result->fetch_assoc();
+    return $row['count'];
+}
 
+function create($data) {
+    global $conn;
+    $npm = htmlspecialchars($data['npm']);
+    $nama = htmlspecialchars($data['nama']);
+    $t1 = htmlspecialchars($data['t1']);
+    $t2 = htmlspecialchars($data['t2']);
+    $t3 = htmlspecialchars($data['t3']);
+    $kuis = htmlspecialchars($data['kuis']);
+    $uts = htmlspecialchars($data['uts']);
+    $uas = htmlspecialchars($data['uas']);
+    
+    $query = "INSERT INTO mahasiswa (npm, nama, t1, t2, t3, kuis, uts, uas) VALUES ('$npm', '$nama', '$t1', '$t2', '$t3', '$kuis', '$uts', '$uas')";
+    
+    $conn->query($query);
+    return $conn->affected_rows;
+}
 
-        $result = mysqli_query($conn , $query);
-        $rows = [];
+function update($data) {
+    global $conn;
+    $id = htmlspecialchars($data['id']);
+    $npm = htmlspecialchars($data['npm']);
+    $nama = htmlspecialchars($data['nama']);
+    $t1 = htmlspecialchars($data['t1']);
+    $t2 = htmlspecialchars($data['t2']);
+    $t3 = htmlspecialchars($data['t3']);
+    $kuis = htmlspecialchars($data['kuis']);
+    $uts = htmlspecialchars($data['uts']);
+    $uas = htmlspecialchars($data['uas']);
+    
+    $query = "UPDATE mahasiswa SET npm = '$npm', nama = '$nama', t1 = '$t1', t2 = '$t2', t3 = '$t3', kuis = '$kuis', uts = '$uts', uas = '$uas' WHERE id = $id";
+    
+    $conn->query($query);
+    return $conn->affected_rows;
+}
 
-        while($row = mysqli_fetch_assoc($result)){
-            $rows[] = $row;
-        }
-
-        return $rows;
-    }
-
-    function add($data) {
-        global $conn;
-
-        $npm = $data['npm'];
-        $nama = $data['nama'];
-        $t1 = $data['t1'];
-        $t2 = $data['t2'];
-        $t3 = $data['t3'];
-        $kuis = $data['kuis'];
-        $uts = $data['uts'];
-        $uas = $data['uas'];
-
-        $query = "INSERT INTO mahasiswa VALUES( '' ,'$npm' , '$nama' , '$t1' ,'$t2' ,'$t3', '$kuis' , '$uts' , '$uas' )";
-
-        mysqli_query($conn , $query);
-
-        return mysqli_affected_rows($conn);
-
-
-    }
-
-    function delete($id) {
-        global $conn;
-
-
-        $query = "DELETE FROM mahasiswa WHERE id = $id";
-        mysqli_query($conn , $query);
-
-        return mysqli_affected_rows($conn);
-
-    }
-
-
-    function update($data) {
-        global $conn;
-
-        $id = $_GET['id'];
-        $npm = $data['npm'];
-        $nama = $data['nama'];
-        $t1 = $data['t1'];
-        $t2 = $data['t2'];
-        $t3 = $data['t3'];
-        $kuis = $data['kuis'];
-        $uts = $data['uts'];
-        $uas = $data['uas'];
-
-        $query = "UPDATE mahasiswa SET npm = '$npm' , nama = '$nama' , t1 = '$t1' , t2 = '$t2' ,  t3 = '$t3', kuis = '$kuis' , uts = '$uts' , uas = '$uas' WHERE id = '$id'";
-
-        mysqli_query($conn , $query);
-
-        return mysqli_affected_rows($conn);
-
-    }
-
-
+function delete($id) {
+    global $conn;
+    $query = "DELETE FROM mahasiswa WHERE id = $id";
+    $conn->query($query);
+    return $conn->affected_rows;
+}
 ?>
